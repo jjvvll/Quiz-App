@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/user', [AuthController::class, 'user']);
 
-    // Future quiz routes go here
-    // Route::apiResource('quizzes', QuizController::class);
+
+    Route::post('/quizzes', [QuizController::class, 'store']);
+    Route::get('/quizzes', [QuizController::class, 'index']);
 });

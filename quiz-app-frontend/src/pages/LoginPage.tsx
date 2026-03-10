@@ -36,10 +36,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
     setErrors({});
-
     try {
       await login(form);
       navigate("/home");
@@ -49,7 +47,6 @@ export default function LoginPage() {
         apiErr?.response?.data?.message ??
         "Invalid credentials. Please try again.";
       const fieldErrors = apiErr?.response?.data?.errors ?? {};
-
       setErrors({
         general: !Object.keys(fieldErrors).length ? message : undefined,
         email: fieldErrors.email?.[0],
@@ -61,237 +58,152 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <div className="min-h-screen grid md:grid-cols-2 bg-zinc-950 font-sans">
+      {/* Left panel */}
+      <div className="relative hidden md:flex flex-col justify-center px-18 py-20 overflow-hidden px-[72px]">
+        {/* Glow blobs */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(255,180,50,0.12),transparent_70%)]" />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_80%_at_80%_80%,rgba(255,100,80,0.08),transparent_60%)]" />
 
-        .login-root {
-          min-height: 100vh;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          font-family: 'DM Sans', sans-serif;
-          background: #0a0a0f;
-        }
-        .login-left {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          padding: 80px 72px;
-          overflow: hidden;
-        }
-        .login-left::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background:
-            radial-gradient(ellipse 80% 60% at 20% 50%, rgba(255,180,50,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 60% 80% at 80% 80%, rgba(255,100,80,0.08) 0%, transparent 60%);
-        }
-        .brand { position: relative; margin-bottom: 64px; }
-        .brand-mark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
-        .brand-icon {
-          width: 44px; height: 44px;
-          background: linear-gradient(135deg, #ffb432, #ff6450);
-          border-radius: 12px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 20px;
-        }
-        .brand-name {
-          font-family: 'Playfair Display', serif;
-          font-size: 22px; font-weight: 700; color: #fff;
-        }
-        .login-headline { position: relative; }
-        .login-headline h1 {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(42px, 4vw, 58px);
-          font-weight: 900; line-height: 1.05; color: #fff; margin-bottom: 20px;
-        }
-        .login-headline h1 span {
-          background: linear-gradient(90deg, #ffb432, #ff6450);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .login-headline p {
-          font-size: 16px; color: rgba(255,255,255,0.45);
-          font-weight: 300; line-height: 1.7; max-width: 320px;
-        }
-        .decorative-line {
-          position: absolute; bottom: 80px; left: 72px; right: 72px;
-          height: 1px;
-          background: linear-gradient(90deg, rgba(255,180,50,0.3), transparent);
-        }
-        .decorative-dots { position: absolute; bottom: 48px; left: 72px; display: flex; gap: 8px; }
-        .decorative-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,180,50,0.4); }
-        .decorative-dots span:first-child { background: rgba(255,180,50,0.8); }
-
-        .login-right {
-          display: flex; align-items: center; justify-content: center;
-          padding: 60px 72px;
-          background: #0f0f18;
-          border-left: 1px solid rgba(255,255,255,0.06);
-        }
-        .login-card { width: 100%; max-width: 400px; }
-        .login-card-header { margin-bottom: 40px; }
-        .login-card-header h2 {
-          font-family: 'Playfair Display', serif;
-          font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px;
-        }
-        .login-card-header p { font-size: 14px; color: rgba(255,255,255,0.4); font-weight: 300; }
-
-        .form-group { margin-bottom: 20px; }
-        .form-label {
-          display: block; font-size: 12px; font-weight: 500;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgba(255,255,255,0.5); margin-bottom: 8px;
-        }
-        .form-input {
-          width: 100%; padding: 14px 16px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 10px;
-          font-family: 'DM Sans', sans-serif; font-size: 15px; color: #fff;
-          outline: none; transition: border-color 0.2s, background 0.2s;
-        }
-        .form-input::placeholder { color: rgba(255,255,255,0.2); }
-        .form-input:focus { border-color: rgba(255,180,50,0.5); background: rgba(255,180,50,0.04); }
-        .form-input.has-error { border-color: rgba(255,80,80,0.5); }
-        .form-error { font-size: 12px; color: #ff6464; margin-top: 6px; }
-
-        .form-options { display: flex; justify-content: flex-end; margin-bottom: 28px; }
-        .forgot-link { font-size: 13px; color: rgba(255,180,50,0.7); text-decoration: none; transition: color 0.2s; }
-        .forgot-link:hover { color: #ffb432; }
-
-        .general-error {
-          padding: 12px 16px;
-          background: rgba(255,80,80,0.08);
-          border: 1px solid rgba(255,80,80,0.2);
-          border-radius: 8px;
-          font-size: 13px; color: #ff8080; margin-bottom: 20px;
-        }
-
-        .submit-btn {
-          width: 100%; padding: 15px;
-          background: linear-gradient(135deg, #ffb432, #ff6450);
-          border: none; border-radius: 10px;
-          font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
-          color: #0a0a0f; cursor: pointer;
-          transition: opacity 0.2s, transform 0.15s;
-        }
-        .submit-btn:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .submit-btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .spinner {
-          width: 16px; height: 16px;
-          border: 2px solid rgba(10,10,15,0.3); border-top-color: #0a0a0f;
-          border-radius: 50%; animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .login-footer { text-align: center; margin-top: 28px; font-size: 14px; color: rgba(255,255,255,0.3); }
-        .login-footer a { color: rgba(255,180,50,0.8); text-decoration: none; font-weight: 500; transition: color 0.2s; }
-        .login-footer a:hover { color: #ffb432; }
-
-        @media (max-width: 768px) {
-          .login-root { grid-template-columns: 1fr; }
-          .login-left { display: none; }
-          .login-right { padding: 40px 24px; background: #0a0a0f; border-left: none; }
-        }
-      `}</style>
-
-      <div className="login-root">
-        <div className="login-left">
-          <div className="brand">
-            <a href="/" className="brand-mark">
-              <div className="brand-icon">⚡</div>
-              <span className="brand-name">QuizApp</span>
-            </a>
-          </div>
-          <div className="login-headline">
-            <h1>
-              Test your <span>knowledge</span> every day.
-            </h1>
-            <p>
-              Challenge yourself with curated quizzes, track your progress, and
-              climb the leaderboard.
-            </p>
-          </div>
-          <div className="decorative-line" />
-          <div className="decorative-dots">
-            <span />
-            <span />
-            <span />
-          </div>
+        {/* Brand */}
+        <div className="relative mb-16">
+          <a href="/" className="inline-flex items-center gap-3 no-underline">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl bg-gradient-to-br from-amber-400 to-red-500">
+              ⚡
+            </div>
+            <span className="text-white text-2xl font-bold">QuizApp</span>
+          </a>
         </div>
 
-        <div className="login-right">
-          <div className="login-card">
-            <div className="login-card-header">
-              <h2>Welcome back</h2>
-              <p>Sign in to continue your journey</p>
-            </div>
+        {/* Headline */}
+        <div className="relative">
+          <h1 className="text-white font-black leading-tight mb-5 text-5xl">
+            Test your{" "}
+            <span className="bg-gradient-to-r from-amber-400 to-red-500 bg-clip-text text-transparent">
+              knowledge
+            </span>{" "}
+            every day.
+          </h1>
+          <p className="text-white/45 font-light leading-relaxed max-w-xs text-base">
+            Challenge yourself with curated quizzes, track your progress, and
+            climb the leaderboard.
+          </p>
+        </div>
 
-            {errors.general && (
-              <div className="general-error">{errors.general}</div>
-            )}
+        {/* Decorative line */}
+        <div className="absolute bottom-20 left-[72px] right-[72px] h-px bg-gradient-to-r from-amber-400/30 to-transparent" />
 
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="form-group">
-                <label className="form-label" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  className={`form-input${errors.email ? " has-error" : ""}`}
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  autoComplete="email"
-                />
-                {errors.email && <p className="form-error">{errors.email}</p>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="password">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  className={`form-input${errors.password ? " has-error" : ""}`}
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                  autoComplete="current-password"
-                />
-                {errors.password && (
-                  <p className="form-error">{errors.password}</p>
-                )}
-              </div>
-
-              <div className="form-options">
-                <a href="#" className="forgot-link">
-                  Forgot password?
-                </a>
-              </div>
-
-              <button type="submit" className="submit-btn" disabled={loading}>
-                <span className="submit-btn-inner">
-                  {loading && <span className="spinner" />}
-                  {loading ? "Signing in..." : "Sign in"}
-                </span>
-              </button>
-            </form>
-
-            <p className="login-footer">
-              Don't have an account? <a href="/register">Create one</a>
-            </p>
-          </div>
+        {/* Dots */}
+        <div className="absolute bottom-12 left-[72px] flex gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80" />
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
         </div>
       </div>
-    </>
+
+      {/* Right panel */}
+      <div className="flex items-center justify-center border-l border-white/5 bg-zinc-900 px-6 md:px-[72px] py-[60px]">
+        <div className="w-full max-w-sm">
+          {/* Card header */}
+          <div className="mb-10">
+            <h2 className="text-white text-3xl font-bold mb-2">Welcome back</h2>
+            <p className="text-white/40 text-sm font-light">
+              Sign in to continue your journey
+            </p>
+          </div>
+
+          {/* General error */}
+          {errors.general && (
+            <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-5">
+              {errors.general}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Email */}
+            <div className="mb-5">
+              <label
+                htmlFor="email"
+                className="block text-xs font-medium uppercase tracking-widest text-white/50 mb-2"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                autoComplete="email"
+                className={`w-full px-4 py-3.5 rounded-xl text-white text-[15px] outline-none border transition-all duration-200 bg-white/5 placeholder:text-white/20 focus:border-amber-400/50 focus:bg-amber-400/[0.04] ${
+                  errors.email ? "border-red-500/50" : "border-white/10"
+                }`}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-400 mt-1.5">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="mb-5">
+              <label
+                htmlFor="password"
+                className="block text-xs font-medium uppercase tracking-widest text-white/50 mb-2"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                autoComplete="current-password"
+                className={`w-full px-4 py-3.5 rounded-xl text-white text-[15px] outline-none border transition-all duration-200 bg-white/5 placeholder:text-white/20 focus:border-amber-400/50 focus:bg-amber-400/[0.04] ${
+                  errors.password ? "border-red-500/50" : "border-white/10"
+                }`}
+              />
+              {errors.password && (
+                <p className="text-xs text-red-400 mt-1.5">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Forgot */}
+            <div className="flex justify-end mb-7">
+              <a
+                href="#"
+                className="text-sm text-amber-400/70 no-underline transition-colors hover:text-amber-400"
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 rounded-xl text-zinc-950 text-[15px] font-medium border-none cursor-pointer transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-br from-amber-400 to-red-500 hover:opacity-90 hover:-translate-y-px"
+            >
+              <span className="flex items-center justify-center gap-2">
+                {loading && (
+                  <span className="w-4 h-4 rounded-full border-2 border-zinc-950/30 border-t-zinc-950 animate-spin" />
+                )}
+                {loading ? "Signing in..." : "Sign in"}
+              </span>
+            </button>
+          </form>
+
+          <p className="text-center mt-7 text-sm text-white/30">
+            Don't have an account?{" "}
+            <a
+              href="/register"
+              className="text-amber-400/80 font-medium no-underline transition-colors hover:text-amber-400"
+            >
+              Create one
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
