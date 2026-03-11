@@ -3,9 +3,9 @@ import { useAuth } from "../context/AuthContext";
 
 // Redirects unauthenticated users to /login
 export function ProtectedRoute() {
-  const { user, loading } = useAuth();
+  const { user, quizzesLoading } = useAuth();
 
-  if (loading) return <FullPageSpinner />;
+  if (quizzesLoading) return <FullPageSpinner />;
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -14,9 +14,9 @@ export function ProtectedRoute() {
 
 // Redirects already-authenticated users away from /login or /register
 export function GuestRoute() {
-  const { user, loading } = useAuth();
+  const { user, quizzesLoading } = useAuth();
 
-  if (loading) return <FullPageSpinner />;
+  if (quizzesLoading) return <FullPageSpinner />;
   if (user) {
     return <Navigate to="/home" replace />;
   }

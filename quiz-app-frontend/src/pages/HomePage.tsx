@@ -5,10 +5,14 @@ import QuizService from "../services/QuizService";
 import type { Quiz, CreateQuizPayload } from "../types/quiz";
 
 export default function HomePage() {
-  const { quizData, appendQuiz, user, logout } = useAuth();
+  const { quizData, quizzesLoading, appendQuiz, removeQuiz, user, logout } =
+    useAuth();
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loadingQuizzes, setLoadingQuizzes] = useState(true);
+
+  const [deleting, setDeleting] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+
   const [showModal, setShowModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<CreateQuizPayload>({
@@ -21,7 +25,6 @@ export default function HomePage() {
 
   useEffect(() => {
     setQuizzes(quizData);
-    setLoadingQuizzes(false);
   }, [quizData]);
 
   const handleLogout = async () => {
@@ -64,6 +67,22 @@ export default function HomePage() {
       }
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    try {
+      const response = await QuizService.delete(deleteId);
+      if (!response.success) {
+        console.error(response.message);
+        return;
+      }
+      removeQuiz(deleteId);
+      setDeleteId(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -187,7 +206,7 @@ export default function HomePage() {
               Your Quizzes
             </h2>
 
-            {loadingQuizzes ? (
+            {quizzesLoading ? (
               <div className="flex items-center gap-3 text-white/30 text-sm py-12 justify-center">
                 <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
                 Loading...
@@ -239,6 +258,15 @@ export default function HomePage() {
                       <span className="text-white/20 text-xs hidden sm:block">
                         {new Date(quiz.created_at).toLocaleDateString()}
                       </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteId(quiz.id);
+                        }}
+                        className="px-2 py-1 text-xs text-red-400/60 border border-red-500/20 rounded-lg bg-transparent cursor-pointer hover:text-red-400 hover:border-red-500/40 transition-all"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -338,6 +366,44 @@ export default function HomePage() {
                 className="flex-1 py-3 rounded-xl text-sm font-medium text-zinc-950 border-none cursor-pointer disabled:opacity-60 transition-all duration-200 bg-gradient-to-br from-amber-400 to-red-500"
               >
                 {creating ? "Creating..." : "Create Quiz"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 px-4 bg-black/75 backdrop-blur-sm"
+          onClick={() => setDeleteId(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl border border-white/10 p-6 bg-zinc-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 mx-auto mb-4">
+              <span className="text-red-400 text-xl">🗑️</span>
+            </div>
+            <h2 className="text-white text-lg font-bold text-center mb-2">
+              Delete Quiz
+            </h2>
+            <p className="text-white/40 text-sm text-center mb-6">
+              Are you sure you want to delete this quiz? This action cannot be
+              undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="flex-1 py-3 rounded-xl text-sm text-white/40 border border-white/10 bg-transparent cursor-pointer hover:text-white/60 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 rounded-xl text-sm font-medium text-white border-none cursor-pointer bg-red-500 hover:bg-red-600 transition-colors"
+              >
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

@@ -27,8 +27,17 @@ const QuizService = {
     return data;
   },
 
-  async delete(id: number): Promise<void> {
-    await api.delete(`/api/quizzes/${id}`);
+  async delete(id: number): Promise<QuizReturnPayload> {
+    try {
+      const response = await api.delete(`/api/quizzes/${id}`);
+      return { success: true, message: response.data.message };
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { message?: string } } };
+      return {
+        success: false,
+        message: apiErr?.response?.data?.message ?? "Failed to delete quiz.",
+      };
+    }
   },
 };
 

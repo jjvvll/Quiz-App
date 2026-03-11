@@ -4,10 +4,12 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quiz;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         try {
@@ -82,10 +84,23 @@ class QuizController extends Controller
 
     public function destroy(Request $request, Quiz $quiz)
     {
-        $this->authorize('delete', $quiz);
-
-        $quiz->delete();
-
-        return response()->json(['message' => 'Quiz deleted.']);
+        try {
+            $this->authorize('delete', $quiz);
+            $quiz->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Quiz deleted successfully.',
+            ], 200);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to delete this quiz.',
+            ], 403);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete quiz. Please try again.',
+            ], 500);
+        }
     }
 }
