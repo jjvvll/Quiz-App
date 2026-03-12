@@ -14,6 +14,7 @@ interface AuthContextValue {
   quizData: Quiz[];
   quizzesLoading: boolean;
   appendQuiz: (newQuizz: Quiz[]) => void;
+  updateQuiz: (newQuizz: Quiz) => void;
   removeQuiz: (id: number) => void;
   checkAuth: () => Promise<boolean>;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -73,6 +74,10 @@ export const AuthProvider = ({ children }: Props) => {
     setQuizzes((prev) => [...items, ...prev]);
   };
 
+  const updateQuiz = (updated: Quiz) => {
+    setQuizzes((prev) => prev.map((q) => (q.id === updated.id ? updated : q)));
+  };
+
   const removeQuiz = (id: number) => {
     setQuizzes((prev) => prev.filter((q) => q.id !== id));
   };
@@ -100,6 +105,7 @@ export const AuthProvider = ({ children }: Props) => {
         quizData,
         quizzesLoading,
         appendQuiz,
+        updateQuiz,
         removeQuiz,
         checkAuth,
         login,

@@ -29,7 +29,7 @@ class QuizPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user !== null;
     }
 
     /**
@@ -37,7 +37,7 @@ class QuizPolicy
      */
     public function update(User $user, Quiz $quiz): bool
     {
-        return false;
+        return $user->id === $quiz->user_id;
     }
 
     /**

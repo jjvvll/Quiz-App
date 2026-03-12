@@ -69,17 +69,32 @@ class QuizController extends Controller
 
     public function update(Request $request, Quiz $quiz)
     {
-        $this->authorize('update', $quiz);
+        try {
+            $this->authorize('update', $quiz);
+            $validated = $request->validate([
+                'title'       => 'sometimes|required|string|max:255',
+                'description' => 'nullable|string',
+                'status'      => 'in:draft,published',
+            ]);
 
-        $validated = $request->validate([
-            'title'       => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'status'      => 'in:draft,published',
-        ]);
+            $quiz->update($validated);
 
-        $quiz->update($validated);
-
-        return response()->json($quiz);
+            return response()->json([
+                'success' => true,
+                'message' => 'Quiz edited successfully.',
+                'quizData' => $quiz,
+            ], 200);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to edit this quiz.',
+            ], 403);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to edit quiz. Please try again.',
+            ], 500);
+        }
     }
 
     public function destroy(Request $request, Quiz $quiz)

@@ -22,8 +22,14 @@ const QuizService = {
     return data;
   },
 
-  async update(id: number, payload: UpdateQuizPayload): Promise<Quiz> {
-    const { data } = await api.put<Quiz>(`/api/quizzes/${id}`, payload);
+  async update(
+    id: number,
+    payload: UpdateQuizPayload,
+  ): Promise<QuizReturnPayload> {
+    const { data } = await api.put<QuizReturnPayload>(
+      `/api/quizzes/${id}`,
+      payload,
+    );
     return data;
   },
 
