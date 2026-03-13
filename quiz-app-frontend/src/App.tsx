@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import QuestionBuilder from "./pages/QuizBuilder";
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
           {/* <Route path="/quiz/:id" element={<QuizPage />} /> */}
           {/* <Route path="/results" element={<ResultsPage />} /> */}
         </Route>
+
+        <Route path="/quiz/:quizId/questions" element={<QuestionBuilder />} />
 
         {/* 404 fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

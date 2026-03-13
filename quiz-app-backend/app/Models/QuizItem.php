@@ -16,4 +16,8 @@ class QuizItem extends Model
         'points',
         'order',
     ];
+
+    protected $casts = [
+        'options' => 'array',
+    ];
 }

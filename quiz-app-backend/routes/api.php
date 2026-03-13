@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\QuizController;
+use App\Http\Controllers\api\QuizItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quizzes', [QuizController::class, 'index']);
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']);
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update']);
+
+    Route::post('/quizzes/{quiz}/items', [QuizItemController::class, 'store']);
+    Route::get('/quizzes/{quiz}/items', [QuizItemController::class, 'index']);
 });

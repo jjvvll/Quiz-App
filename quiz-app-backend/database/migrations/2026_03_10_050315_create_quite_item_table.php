@@ -14,7 +14,7 @@ return new class extends Migration
             $table->text('question');
             $table->string('answer');
             $table->json('options')->nullable();   // for multiple choice distractors
-            $table->enum('type', ['multiple_choice', 'true_false', 'short_answer'])->default('multiple_choice');
+            $table->enum('type', ['multiple_choice', 'true_false', 'identification', 'essay', 'short_answer'])->default('multiple_choice');
             $table->integer('points')->default(1);
             $table->integer('order')->default(0);  // display order within a quiz
             $table->timestamps();

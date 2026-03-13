@@ -182,6 +182,7 @@ export default function HomePage() {
                 {quizzes.map((quiz) => (
                   <div
                     key={quiz.id}
+                    onClick={() => navigate(`/quiz/${quiz.id}/questions`)}
                     className="flex items-center justify-between px-3 md:px-5 py-3 md:py-4 rounded-xl border border-white/10 transition-all duration-200 cursor-pointer gap-3 bg-white/[0.02] hover:border-amber-400/20 hover:bg-white/[0.04]"
                   >
                     {/* Left */}
