@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('quiz_id')->constrained()->cascadeOnDelete();
             $table->text('question');
-            $table->string('answer');
+            $table->string('answer')->nullable();
             $table->json('options')->nullable();   // for multiple choice distractors
             $table->enum('type', ['multiple_choice', 'true_false', 'identification', 'essay', 'short_answer'])->default('multiple_choice');
             $table->integer('points')->default(1);

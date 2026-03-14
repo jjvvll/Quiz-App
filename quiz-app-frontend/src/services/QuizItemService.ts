@@ -1,14 +1,16 @@
 import api from "../api/axios";
-import type { QuestionPayload } from "../types/quizItem";
-import type { QuizReturnPayload } from "../types/quiz";
+import type {
+  QuestionItem,
+  QuizItemListReturnPayload,
+} from "../types/quizItem";
 
 const QuizItemService = {
   async store(
     quizId: number,
-    questions: QuestionPayload[],
-  ): Promise<QuizReturnPayload> {
+    questions: QuestionItem[],
+  ): Promise<QuizItemListReturnPayload> {
     try {
-      const { data } = await api.post<QuizReturnPayload>(
+      const { data } = await api.post<QuizItemListReturnPayload>(
         `/api/quizzes/${quizId}/items`,
         questions,
       );
@@ -22,9 +24,9 @@ const QuizItemService = {
     }
   },
 
-  async getAll(quizId: number): Promise<QuizReturnPayload> {
+  async getAll(quizId: number): Promise<QuizItemListReturnPayload> {
     try {
-      const { data } = await api.get<QuizReturnPayload>(
+      const { data } = await api.get<QuizItemListReturnPayload>(
         `/api/quizzes/${quizId}/items`,
       );
       return data;

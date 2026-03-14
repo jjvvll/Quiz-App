@@ -2,13 +2,14 @@ import api from "../api/axios";
 import type {
   Quiz,
   QuizReturnPayload,
+  QuizListReturnPayload,
   CreateQuizPayload,
   UpdateQuizPayload,
 } from "../types/quiz";
 
 const QuizService = {
-  async getAll(): Promise<QuizReturnPayload> {
-    const { data } = await api.get<QuizReturnPayload>("/api/quizzes");
+  async getAll(): Promise<QuizListReturnPayload> {
+    const { data } = await api.get<QuizListReturnPayload>("/api/quizzes");
     return data;
   },
 

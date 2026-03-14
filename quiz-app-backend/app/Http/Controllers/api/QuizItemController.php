@@ -7,6 +7,7 @@ use App\Models\Quiz;
 use App\Models\QuizItem;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Validation\Rule;
 
 class QuizItemController extends Controller
 {
@@ -34,10 +35,12 @@ class QuizItemController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Quiz $quiz)
     {
         try {
+            $this->authorize('update', $quiz);
             $validated = $request->validate([
+                '*.id'       => 'nullable|integer|exists:quiz_items,id',
                 '*.quiz_id'  => 'required|integer|exists:quizzes,id',
                 '*.question' => 'required|string',
                 '*.answer'   => 'nullable|string',
@@ -47,22 +50,41 @@ class QuizItemController extends Controller
                 '*.order'    => 'required|integer|min:1',
             ]);
 
-            $items = collect($validated)->map(
-                fn($item) =>
-                QuizItem::create($item)
-            );
+            $items = collect($validated)->map(function ($item) {
+                $item['options'] = $item['options'] ?? [];
+
+                if (isset($item['id']) && !empty($item['id'])) {
+                    $quizItem = QuizItem::find($item['id']);
+                    unset($item['id']);
+                    $quizItem->update($item);
+                    return $quizItem;
+                } else {
+                    unset($item['id']);
+                    return QuizItem::create($item);
+                }
+            });
 
             return response()->json([
                 'success'  => true,
                 'message'  => 'Questions saved successfully.',
                 'quizData' => $items,
-            ], 201);
+            ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed.',
+                'message' => 'Validation failed.' . $e->errors(),
                 'errors'  => $e->errors(),
             ], 422);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to edit these questions.',
+            ], 403);
+        } catch (\Illuminate\Database\QueryException $e) { // 👈 catch DB errors specifically
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(), // 👈 returns the actual DB error
+            ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

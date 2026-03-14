@@ -13,16 +13,21 @@ class QuizController extends Controller
     public function index(Request $request)
     {
         try {
+            $this->authorize('viewAny', Quiz::class); //
             $quizzes = $request->user()
                 ->quizzes()
                 ->latest()
                 ->get();
-
             return response()->json([
                 'success' => true,
                 'message' => 'Quizzes retrieved successfully.',
                 'quizData' => $quizzes,
             ], 200);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to view quizzes.',
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -30,41 +35,60 @@ class QuizController extends Controller
             ], 500);
         }
     }
+
     public function store(Request $request)
     {
         try {
+            $this->authorize('create', Quiz::class); //
             $validated = $request->validate([
                 'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'status'      => 'in:draft,published',
             ]);
-
             $quiz = Quiz::create([
                 'user_id'     => $request->user()->id,
                 'title'       => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'status'      => $validated['status'] ?? 'draft',
             ]);
-
             return response()->json([
-                'success' => true,
-                'message' => 'Quiz created successfully.',
-                'quizData'    => $quiz,
+                'success'  => true,
+                'message'  => 'Quiz created successfully.',
+                'quizData' => $quiz,
             ], 201);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to create a quiz.',
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create quiz. Please try again.',
-                'quizData'    => null,
             ], 500);
         }
     }
 
     public function show(Request $request, Quiz $quiz)
     {
-        $this->authorize('view', $quiz);
-
-        return response()->json($quiz);
+        try {
+            $this->authorize('view', $quiz); // already there
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Quiz retrieved successfully.',
+                'quizData' => $quiz,
+            ], 200);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to view this quiz.',
+            ], 403);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve quiz. Please try again.',
+            ], 500);
+        }
     }
 
     public function update(Request $request, Quiz $quiz)

@@ -13,7 +13,13 @@ export interface Quiz {
 export interface QuizReturnPayload {
   success: boolean;
   message: string;
-  quizData?: Quiz | Quiz[];
+  quizData?: Quiz;
+}
+
+export interface QuizListReturnPayload {
+  success: boolean;
+  message: string;
+  quizData?: Quiz[];
 }
 
 export interface CreateQuizPayload {
