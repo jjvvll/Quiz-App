@@ -44,6 +44,7 @@ function createQuestion(type: QuestionType, order: number): QuestionDraft {
     options: type === "multiple_choice" ? ["", ""] : [],
     points: 1,
     order,
+    time_limit: null,
   };
 }
 
@@ -58,6 +59,9 @@ export default function QuestionBuilder() {
   const [error, setError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
+
+  const [bulkTimeLimit, setBulkTimeLimit] = useState<string>("");
+  const [bulkType, setBulkType] = useState<QuestionType | "all">("all");
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -79,6 +83,7 @@ export default function QuestionBuilder() {
           type: item.type,
           points: item.points,
           order: item.order,
+          time_limit: item.time_limit,
         })),
       );
       setLoading(false);
@@ -179,6 +184,7 @@ export default function QuestionBuilder() {
         type: q.type,
         points: q.points,
         order: q.order,
+        time_limit: q.time_limit,
       }));
 
       console.log(parsedQuizId, payload);
@@ -191,6 +197,18 @@ export default function QuestionBuilder() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const applyTimeLimitToAll = () => {
+    const value = bulkTimeLimit ? parseInt(bulkTimeLimit) : null;
+    setQuestions((prev) =>
+      prev.map((q) => {
+        if (bulkType === "all" || q.type === bulkType) {
+          return { ...q, time_limit: value };
+        }
+        return q;
+      }),
+    );
   };
 
   const handleCancel = () => navigate("/home");
@@ -351,22 +369,50 @@ export default function QuestionBuilder() {
                     </p>
                   )}
 
-                  {/* Points */}
-                  <div className="flex items-center gap-3">
-                    <label className="text-xs uppercase tracking-widest text-white/40 font-medium">
-                      Points
-                    </label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={q.points}
-                      onChange={(e) =>
-                        updateQuestion(q.localId, {
-                          points: parseInt(e.target.value) || 1,
-                        })
-                      }
-                      className="w-16 px-3 py-1.5 rounded-lg text-white text-sm border border-white/10 bg-white/5 focus:border-amber-400/50 focus:outline-none text-center transition-colors"
-                    />
+                  {/* Points + Timer */}
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <label className="text-xs uppercase tracking-widest text-white/40 font-medium">
+                        Points
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={q.points}
+                        onChange={(e) =>
+                          updateQuestion(q.localId, {
+                            points: parseInt(e.target.value) || 1,
+                          })
+                        }
+                        className="w-16 px-3 py-1.5 rounded-lg text-white text-sm border border-white/10 bg-white/5 focus:border-amber-400/50 focus:outline-none text-center transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <label className="text-xs uppercase tracking-widest text-white/40 font-medium">
+                        Time limit
+                      </label>
+                      <select
+                        value={q.time_limit ?? ""}
+                        onChange={(e) =>
+                          updateQuestion(q.localId, {
+                            time_limit: e.target.value
+                              ? parseInt(e.target.value)
+                              : null,
+                          })
+                        }
+                        className="px-3 py-1.5 rounded-lg text-white text-sm border border-white/10 bg-zinc-900 focus:border-amber-400/50 focus:outline-none transition-colors cursor-pointer"
+                      >
+                        <option value="">No limit</option>
+                        <option value="15">15s</option>
+                        <option value="30">30s</option>
+                        <option value="45">45s</option>
+                        <option value="60">1 min</option>
+                        <option value="90">1.5 min</option>
+                        <option value="120">2 min</option>
+                        <option value="300">5 min</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -374,6 +420,50 @@ export default function QuestionBuilder() {
 
             {/* Footer */}
             <div className="mt-6 grid gap-3">
+              {/* Set time for all */}
+              {questions.length > 0 && (
+                <div className="flex items-center gap-2 p-3 rounded-xl border border-white/10 bg-white/[0.02] flex-wrap">
+                  <label className="text-xs uppercase tracking-widest text-white/40 font-medium flex-shrink-0">
+                    Set time for
+                  </label>
+
+                  <select
+                    value={bulkType}
+                    onChange={(e) =>
+                      setBulkType(e.target.value as QuestionType | "all")
+                    }
+                    className="px-3 py-1.5 rounded-lg text-white text-sm border border-white/10 bg-zinc-900 focus:border-amber-400/50 focus:outline-none transition-colors cursor-pointer"
+                  >
+                    <option value="all">All types</option>
+                    <option value="multiple_choice">Multiple choice</option>
+                    <option value="identification">Identification</option>
+                    <option value="essay">Essay</option>
+                  </select>
+
+                  <select
+                    value={bulkTimeLimit}
+                    onChange={(e) => setBulkTimeLimit(e.target.value)}
+                    className="flex-1 px-3 py-1.5 rounded-lg text-white text-sm border border-white/10 bg-zinc-900 focus:border-amber-400/50 focus:outline-none transition-colors cursor-pointer"
+                  >
+                    <option value="">No limit</option>
+                    <option value="15">15s</option>
+                    <option value="30">30s</option>
+                    <option value="45">45s</option>
+                    <option value="60">1 min</option>
+                    <option value="90">1.5 min</option>
+                    <option value="120">2 min</option>
+                    <option value="300">5 min</option>
+                  </select>
+
+                  <button
+                    onClick={applyTimeLimitToAll}
+                    className="px-4 py-1.5 rounded-lg text-xs font-medium text-zinc-950 bg-gradient-to-br from-amber-400 to-red-500 border-none cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0"
+                  >
+                    Apply
+                  </button>
+                </div>
+              )}
+
               {/* Add question button */}
               <div className="relative">
                 <button
@@ -408,7 +498,6 @@ export default function QuestionBuilder() {
                   </div>
                 )}
               </div>
-
               {/* Save / Cancel */}
               {questions.length > 0 && (
                 <div className="flex gap-3">

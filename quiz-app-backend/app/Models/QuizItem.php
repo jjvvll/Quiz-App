@@ -15,6 +15,7 @@ class QuizItem extends Model
         'type',
         'points',
         'order',
+        'time_limit',
     ];
 
     protected $casts = [

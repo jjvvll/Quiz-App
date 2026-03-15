@@ -48,6 +48,7 @@ class QuizItemController extends Controller
                 '*.type'     => 'required|in:multiple_choice,identification,essay',
                 '*.points'   => 'required|integer|min:1',
                 '*.order'    => 'required|integer|min:1',
+                '*.time_limit'    => 'nullable|integer|min:15',
             ]);
 
             $items = collect($validated)->map(function ($item) {

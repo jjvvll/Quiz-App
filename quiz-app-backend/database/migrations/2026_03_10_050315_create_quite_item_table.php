@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('type', ['multiple_choice', 'true_false', 'identification', 'essay', 'short_answer'])->default('multiple_choice');
             $table->integer('points')->default(1);
             $table->integer('order')->default(0);  // display order within a quiz
+            $table->integer('time_limit')->nullable()->default(null);
             $table->timestamps();
         });
     }

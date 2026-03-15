@@ -7,6 +7,7 @@ export interface QuestionItem {
   type: "multiple_choice" | "identification" | "essay";
   points: number;
   order: number;
+  time_limit: number | null;
 }
 
 export interface QuizItemListReturnPayload {
