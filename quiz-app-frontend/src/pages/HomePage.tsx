@@ -235,6 +235,17 @@ export default function HomePage() {
                       >
                         Edit
                       </button>
+                      {quiz.status === "published" && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/quiz/${quiz.token}`);
+                          }}
+                          className="px-2 py-1 text-xs text-blue-400/60 border border-blue-400/20 rounded-lg bg-transparent cursor-pointer hover:text-blue-400 hover:border-blue-400/40 transition-all"
+                        >
+                          Take
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

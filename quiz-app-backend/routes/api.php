@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\QuizController;
 use App\Http\Controllers\api\QuizItemController;
+use App\Http\Controllers\api\ResponseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,9 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login',    [AuthController::class, 'login']);
 });
+
+Route::get('/quiz/{token}/start', [ResponseController::class, 'show']);
+Route::post('/quiz/{token}/submit', [ResponseController::class, 'store']);
 
 // Protected routes (requires Sanctum token)
 Route::middleware('auth:sanctum')->group(function () {

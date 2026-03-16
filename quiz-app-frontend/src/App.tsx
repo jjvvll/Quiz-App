@@ -4,6 +4,9 @@ import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import QuestionBuilder from "./pages/QuizBuilder";
+import QuizRegisterPage from "./pages/Quizregisterpage ";
+import TakeQuizPage from "./pages/Takequizpage ";
+import QuizResultPage from "./pages/Quizresultpage";
 
 function App() {
   return (
@@ -27,6 +30,10 @@ function App() {
         </Route>
 
         <Route path="/quiz/:quizId/questions" element={<QuestionBuilder />} />
+
+        <Route path="/quiz/:token" element={<QuizRegisterPage />} />
+        <Route path="/quiz/:token/take" element={<TakeQuizPage />} />
+        <Route path="/quiz/:token/result" element={<QuizResultPage />} />
 
         {/* 404 fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

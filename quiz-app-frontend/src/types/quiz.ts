@@ -1,11 +1,14 @@
 export type QuizStatus = "draft" | "published";
 
+export type QuestionType = "multiple_choice" | "identification" | "essay";
+
 export interface Quiz {
   id: number;
   user_id: number;
   title: string;
   description: string | null;
   status: QuizStatus;
+  token: string;
   created_at: string;
   updated_at: string;
 }

@@ -3,8 +3,7 @@ import { useParams } from "react-router-dom";
 import QuizItemService from "../services/QuizItemService";
 import { useNavigate } from "react-router-dom";
 import type { QuestionItem } from "../types/quizItem";
-
-export type QuestionType = "multiple_choice" | "identification" | "essay";
+import type { QuestionType } from "../types/quiz";
 
 // export interface QuestionPayload {
 //   quiz_id: number;

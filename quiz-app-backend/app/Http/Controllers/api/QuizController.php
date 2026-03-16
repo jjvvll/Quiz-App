@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Quiz;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class QuizController extends Controller
 {
@@ -47,6 +48,7 @@ class QuizController extends Controller
             ]);
             $quiz = Quiz::create([
                 'user_id'     => $request->user()->id,
+                'token'   => $this->generateUniqueToken(),
                 'title'       => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'status'      => $validated['status'] ?? 'draft',
@@ -101,6 +103,8 @@ class QuizController extends Controller
                 'status'      => 'in:draft,published',
             ]);
 
+            $validated['token'] = $quiz->token ?? $this->generateUniqueToken();
+
             $quiz->update($validated);
 
             return response()->json([
@@ -141,5 +145,13 @@ class QuizController extends Controller
                 'message' => 'Failed to delete quiz. Please try again.',
             ], 500);
         }
+    }
+    private function generateUniqueToken(): string
+    {
+        do {
+            $token = Str::random(12);
+        } while (Quiz::where('token', $token)->exists());
+
+        return $token;
     }
 }
