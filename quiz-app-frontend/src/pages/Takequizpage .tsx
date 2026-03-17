@@ -171,7 +171,8 @@ export default function TakeQuizPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-sans flex flex-col">
-      <div className="h-1 bg-white/5">
+      {/* Progress bar */}
+      <div className="h-1 bg-white/5 flex-shrink-0">
         <div
           className="h-1 bg-gradient-to-r from-amber-400 to-red-500 transition-all duration-500"
           style={{
@@ -180,28 +181,46 @@ export default function TakeQuizPage() {
         />
       </div>
 
-      <div className="flex-1 flex flex-col px-4 md:px-8 py-6 max-w-2xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-white/30 text-xs">
-            {currentIndex + 1} / {quiz.items.length}
-          </span>
-          <span className="text-white/30 text-xs">
+      {/* Full screen question area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-4 md:px-12 py-4 md:py-6 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="text-white/20 text-xs md:text-sm">
+              {currentIndex + 1}
+              <span className="text-white/10"> / {quiz.items.length}</span>
+            </span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                currentQuestion.type === "multiple_choice"
+                  ? "bg-violet-400/10 text-violet-400"
+                  : currentQuestion.type === "identification"
+                    ? "bg-amber-400/10 text-amber-400"
+                    : "bg-green-400/10 text-green-400"
+              }`}
+            >
+              {currentQuestion.type.replace("_", " ")}
+            </span>
+          </div>
+          <span className="text-white/20 text-xs md:text-sm">
             {currentQuestion.points} pt{currentQuestion.points !== 1 ? "s" : ""}
           </span>
         </div>
 
+        {/* Error */}
         {error && (
-          <div className="mb-4 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mx-4 md:mx-12 mb-2 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex-shrink-0">
             {error}
           </div>
         )}
 
+        {/* Timer */}
         {timeLeft !== null && (
-          <div className="mb-5">
+          <div className="px-4 md:px-12 mb-4 flex-shrink-0">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-white/40">Time remaining</span>
               <span
-                className={`text-sm font-medium ${timerPercent <= 25 ? "text-red-400" : "text-white/60"}`}
+                className={`text-sm font-medium tabular-nums ${timerPercent <= 25 ? "text-red-400" : "text-white/60"}`}
               >
                 {formatTime(timeLeft)}
               </span>
@@ -215,38 +234,26 @@ export default function TakeQuizPage() {
           </div>
         )}
 
-        <div className="flex-1">
-          <div className="mb-2">
-            <span
-              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                currentQuestion.type === "multiple_choice"
-                  ? "bg-violet-400/10 text-violet-400"
-                  : currentQuestion.type === "identification"
-                    ? "bg-amber-400/10 text-amber-400"
-                    : "bg-green-400/10 text-green-400"
-              }`}
-            >
-              {currentQuestion.type.replace("_", " ")}
-            </span>
-          </div>
-
-          <p className="text-white text-lg font-medium leading-relaxed mb-6">
+        {/* Question + answer — centered vertically */}
+        <div className="flex-1 flex flex-col justify-center px-4 md:px-12 lg:px-24 xl:px-40 py-6">
+          <p className="text-white text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed mb-8 md:mb-10">
             {currentQuestion.question}
           </p>
 
+          {/* Multiple choice */}
           {currentQuestion.type === "multiple_choice" && (
-            <div className="grid gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {(currentQuestion.options ?? []).map((opt, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentAnswer(opt)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-sm border cursor-pointer transition-all ${
+                  className={`w-full text-left px-5 py-4 rounded-2xl text-sm md:text-base border cursor-pointer transition-all ${
                     currentAnswer === opt
                       ? "border-amber-400/50 bg-amber-400/10 text-white"
-                      : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:text-white"
+                      : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:bg-white/[0.04] hover:text-white"
                   }`}
                 >
-                  <span className="text-white/30 mr-3 text-xs">
+                  <span className="text-white/30 mr-3 text-xs font-medium">
                     {String.fromCharCode(65 + i)}.
                   </span>
                   {opt}
@@ -255,6 +262,7 @@ export default function TakeQuizPage() {
             </div>
           )}
 
+          {/* Identification */}
           {currentQuestion.type === "identification" && (
             <input
               type="text"
@@ -264,50 +272,54 @@ export default function TakeQuizPage() {
               onKeyDown={(e) =>
                 e.key === "Enter" && (isLast ? handleSubmit() : goNext())
               }
-              className="w-full px-4 py-3 rounded-xl text-white text-sm border border-white/10 bg-white/5 focus:border-amber-400/50 focus:outline-none placeholder:text-white/20 transition-colors"
+              className="w-full md:max-w-lg px-5 py-4 rounded-2xl text-white text-sm md:text-base border border-white/10 bg-white/5 focus:border-amber-400/50 focus:outline-none placeholder:text-white/20 transition-colors"
             />
           )}
 
+          {/* Essay */}
           {currentQuestion.type === "essay" && (
             <textarea
-              rows={5}
+              rows={6}
               placeholder="Write your answer..."
               value={currentAnswer}
               onChange={(e) => setCurrentAnswer(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl text-white text-sm border border-white/10 bg-white/5 resize-none focus:border-amber-400/50 focus:outline-none placeholder:text-white/20 transition-colors"
+              className="w-full md:max-w-2xl px-5 py-4 rounded-2xl text-white text-sm md:text-base border border-white/10 bg-white/5 resize-none focus:border-amber-400/50 focus:outline-none placeholder:text-white/20 transition-colors"
             />
           )}
         </div>
 
-        <div className="flex gap-3 mt-6">
-          {currentIndex > 0 && (
-            <button
-              onClick={() => {
-                saveAnswer();
-                setCurrentIndex((i) => i - 1);
-                setQuestionStartTime(Date.now());
-              }}
-              className="px-5 py-3 rounded-xl text-sm text-white/40 border border-white/10 bg-transparent cursor-pointer hover:text-white/60 transition-colors"
-            >
-              ← Back
-            </button>
-          )}
-          {isLast ? (
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="flex-1 py-3 rounded-xl text-sm font-medium text-zinc-950 border-none cursor-pointer disabled:opacity-60 transition-all bg-gradient-to-br from-amber-400 to-red-500 hover:opacity-90"
-            >
-              {submitting ? "Submitting..." : "Submit Quiz"}
-            </button>
-          ) : (
-            <button
-              onClick={goNext}
-              className="flex-1 py-3 rounded-xl text-sm font-medium text-white border border-white/10 bg-white/5 cursor-pointer hover:bg-white/10 transition-colors"
-            >
-              Next →
-            </button>
-          )}
+        {/* Bottom nav — always pinned to bottom */}
+        <div className="flex-shrink-0 px-4 md:px-12 lg:px-24 xl:px-40 py-4 md:py-6 border-t border-white/5">
+          <div className="flex gap-3 max-w-2xl">
+            {currentIndex > 0 && (
+              <button
+                onClick={() => {
+                  saveAnswer();
+                  setCurrentIndex((i) => i - 1);
+                  setQuestionStartTime(Date.now());
+                }}
+                className="px-6 py-3 rounded-xl text-sm text-white/40 border border-white/10 bg-transparent cursor-pointer hover:text-white/60 transition-colors"
+              >
+                ← Back
+              </button>
+            )}
+            {isLast ? (
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex-1 py-3 rounded-xl text-sm font-medium text-zinc-950 border-none cursor-pointer disabled:opacity-60 transition-all bg-gradient-to-br from-amber-400 to-red-500 hover:opacity-90"
+              >
+                {submitting ? "Submitting..." : "Submit Quiz"}
+              </button>
+            ) : (
+              <button
+                onClick={goNext}
+                className="flex-1 py-3 rounded-xl text-sm font-medium text-white border border-white/10 bg-white/5 cursor-pointer hover:bg-white/10 transition-colors"
+              >
+                Next →
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
