@@ -33,4 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/quizzes/{quiz}/items', [QuizItemController::class, 'store']);
     Route::get('/quizzes/{quiz}/items', [QuizItemController::class, 'index']);
+
+    // routes
+    Route::get('/quizzes/{quiz}/responses', [ResponseController::class, 'index']);
+    Route::get('/quizzes/{quiz}/responses/{quizResponse}', [ResponseController::class, 'showResponse']);
 });

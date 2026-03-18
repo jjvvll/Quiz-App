@@ -246,6 +246,15 @@ export default function HomePage() {
                           Take
                         </button>
                       )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/quiz/${quiz.id}/responses`);
+                        }}
+                        className="px-2 py-1 text-xs text-white/40 border border-white/10 rounded-lg bg-transparent cursor-pointer hover:text-white/60 hover:border-white/20 transition-all"
+                      >
+                        Responses
+                      </button>
                     </div>
                   </div>
                 ))}

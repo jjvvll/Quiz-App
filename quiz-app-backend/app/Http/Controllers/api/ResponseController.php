@@ -4,12 +4,52 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quiz;
-use App\Models\Response;
-use App\Models\ResponseAnswer;
+use App\Models\QuizResponse;
+use App\Models\QuizResponseAnswer;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class ResponseController extends Controller
 {
+    use AuthorizesRequests;
+    public function index(Request $request, Quiz $quiz)
+    {
+        try {
+            $this->authorize('view', $quiz);
+            $responses = $quiz->responses()
+                ->with('responseAnswers.quizItem')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'success'   => true,
+                'message'   => 'Responses retrieved successfully.',
+                'responses' => $responses,
+            ], 200);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve responses.' . $e], 500);
+        }
+    }
+
+    public function showResponse(Request $request, Quiz $quiz, QuizResponse $quizResponse)
+    {
+        try {
+            $this->authorize('view', $quiz);
+            $quizResponse->load('responseAnswers.quizItem');
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Response retrieved successfully.',
+                'response' => $quizResponse,
+            ], 200);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve response.'], 500);
+        }
+    }
+
     public function show(string $token)
     {
         try {
@@ -70,7 +110,7 @@ class ResponseController extends Controller
                 'answers.*.time_taken'   => 'nullable|integer',
             ]);
 
-            $response = Response::create([
+            $response = QuizResponse::create([
                 'quiz_id'          => $quiz->id,
                 'respondent_name'  => $validated['respondent_name'],
                 'respondent_email' => $validated['respondent_email'] ?? null,
@@ -97,8 +137,8 @@ class ResponseController extends Controller
                     $score += $pointsAwarded;
                 }
 
-                ResponseAnswer::create([
-                    'response_id'    => $response->id,
+                QuizResponseAnswer::create([
+                    'quiz_response_id'    => $response->id,
                     'quiz_item_id'   => $item->id,
                     'answer'         => $ans['answer'] ?? null,
                     'is_correct'     => $isCorrect,

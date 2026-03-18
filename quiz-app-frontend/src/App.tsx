@@ -7,6 +7,7 @@ import QuestionBuilder from "./pages/QuizBuilder";
 import QuizRegisterPage from "./pages/Quizregisterpage ";
 import TakeQuizPage from "./pages/Takequizpage ";
 import QuizResultPage from "./pages/Quizresultpage";
+import QuizResponsesPage from "./pages/QuizResponsesPage";
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
         <Route path="/quiz/:token" element={<QuizRegisterPage />} />
         <Route path="/quiz/:token/take" element={<TakeQuizPage />} />
         <Route path="/quiz/:token/result" element={<QuizResultPage />} />
+
+        <Route path="/quiz/:quizId/responses" element={<QuizResponsesPage />} />
 
         {/* 404 fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
