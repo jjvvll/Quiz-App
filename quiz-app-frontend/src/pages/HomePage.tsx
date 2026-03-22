@@ -17,6 +17,9 @@ export default function HomePage() {
 
   const [showModal, setShowModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   useEffect(() => {
     setQuizzes(quizData);
@@ -41,6 +44,13 @@ export default function HomePage() {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const handleCopyLink = (token: string, id: number) => {
+    const link = `${window.location.origin}/quiz/${token}`;
+    navigator.clipboard.writeText(link);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000); // reset after 2 seconds
   };
 
   const stats = {
@@ -216,45 +226,94 @@ export default function HomePage() {
                       <span className="text-white/20 text-xs hidden sm:block">
                         {new Date(quiz.created_at).toLocaleDateString()}
                       </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteId(quiz.id);
-                        }}
-                        className="px-2 py-1 text-xs text-red-400/60 border border-red-500/20 rounded-lg bg-transparent cursor-pointer hover:text-red-400 hover:border-red-500/40 transition-all"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditQuiz(quiz);
-                          setShowModal(true);
-                        }}
-                        className="px-2 py-1 text-xs text-amber-400/60 border border-amber-400/20 rounded-lg bg-transparent cursor-pointer hover:text-amber-400 hover:border-amber-400/40 transition-all"
-                      >
-                        Edit
-                      </button>
-                      {quiz.status === "published" && (
+
+                      {/* 3-dot menu */}
+                      <div className="relative">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/quiz/${quiz.token}`);
+                            setOpenMenuId(
+                              openMenuId === quiz.id ? null : quiz.id,
+                            );
                           }}
-                          className="px-2 py-1 text-xs text-blue-400/60 border border-blue-400/20 rounded-lg bg-transparent cursor-pointer hover:text-blue-400 hover:border-blue-400/40 transition-all"
+                          className="w-7 h-7 flex flex-col items-center justify-center gap-[3px] bg-transparent border-none cursor-pointer rounded-lg hover:bg-white/5 transition-colors"
                         >
-                          Take
+                          <span className="w-1 h-1 rounded-full bg-white/40" />
+                          <span className="w-1 h-1 rounded-full bg-white/40" />
+                          <span className="w-1 h-1 rounded-full bg-white/40" />
                         </button>
-                      )}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/quiz/${quiz.id}/responses`);
-                        }}
-                        className="px-2 py-1 text-xs text-white/40 border border-white/10 rounded-lg bg-transparent cursor-pointer hover:text-white/60 hover:border-white/20 transition-all"
-                      >
-                        Responses
-                      </button>
+
+                        {openMenuId === quiz.id && (
+                          <div
+                            className="absolute right-0 top-9 w-40 rounded-xl border border-white/10 bg-zinc-900 p-1.5 z-20"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              onClick={() => {
+                                setEditQuiz(quiz);
+                                setShowModal(true);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full text-left px-3 py-2 rounded-lg text-xs text-amber-400/80 hover:bg-white/5 transition-colors bg-transparent border-none cursor-pointer"
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              onClick={() => {
+                                navigate(`/quiz/${quiz.id}/questions`);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full text-left px-3 py-2 rounded-lg text-xs text-white/60 hover:bg-white/5 transition-colors bg-transparent border-none cursor-pointer"
+                            >
+                              📝 Questions
+                            </button>
+                            <button
+                              onClick={() => {
+                                navigate(`/quiz/${quiz.id}/responses`);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full text-left px-3 py-2 rounded-lg text-xs text-white/60 hover:bg-white/5 transition-colors bg-transparent border-none cursor-pointer"
+                            >
+                              📊 Responses
+                            </button>
+                            {quiz.status === "published" && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    navigate(`/quiz/${quiz.token}`);
+                                    setOpenMenuId(null);
+                                  }}
+                                  className="w-full text-left px-3 py-2 rounded-lg text-xs text-blue-400/80 hover:bg-white/5 transition-colors bg-transparent border-none cursor-pointer"
+                                >
+                                  🔗 Take quiz
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleCopyLink(quiz.token, quiz.id);
+                                    setOpenMenuId(null);
+                                  }}
+                                  className="w-full text-left px-3 py-2 rounded-lg text-xs text-white/60 hover:bg-white/5 transition-colors bg-transparent border-none cursor-pointer"
+                                >
+                                  {copiedId === quiz.id
+                                    ? "✅ Copied!"
+                                    : "📋 Copy link"}
+                                </button>
+                              </>
+                            )}
+
+                            <div className="h-px bg-white/5 my-1" />
+                            <button
+                              onClick={() => {
+                                setDeleteId(quiz.id);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full text-left px-3 py-2 rounded-lg text-xs text-red-400/80 hover:bg-red-500/10 transition-colors bg-transparent border-none cursor-pointer"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -31,6 +31,9 @@ export default function TakeQuizPage() {
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // stores remaining time per question id
+  const [timers, setTimers] = useState<Record<number, number>>({});
+
   useEffect(() => {
     if (!state?.quiz) {
       navigate(`/quiz/${token}`, { replace: true });
@@ -75,15 +78,23 @@ export default function TakeQuizPage() {
     if (timerRef.current) clearInterval(timerRef.current);
 
     if (currentQuestion.time_limit) {
-      setTimeLeft(currentQuestion.time_limit);
+      // if no saved time for this question yet, use the full time limit
+      const initialTime =
+        timers[currentQuestion.id] ?? currentQuestion.time_limit;
+      setTimeLeft(initialTime);
+
       timerRef.current = setInterval(() => {
         setTimeLeft((t) => {
           if (t === null) return null;
           if (t <= 1) {
             clearInterval(timerRef.current!);
+            // save 0 for this question so if they come back it stays at 0
+            setTimers((prev) => ({ ...prev, [currentQuestion.id]: 0 }));
             goNext();
             return 0;
           }
+          // save the current remaining time so it persists when navigating away
+          setTimers((prev) => ({ ...prev, [currentQuestion.id]: t - 1 }));
           return t - 1;
         });
       }, 1000);
