@@ -14,6 +14,7 @@ export interface QuizData {
   id: number;
   title: string;
   description: string | null;
+  status: "draft" | "published" | "closed";
   items: QuizItem[];
 }
 

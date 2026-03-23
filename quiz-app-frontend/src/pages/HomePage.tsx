@@ -6,7 +6,8 @@ import type { Quiz } from "../types/quiz";
 import QuizModal from "../components/QuizModal";
 
 export default function HomePage() {
-  const { quizData, quizzesLoading, removeQuiz, user, logout } = useAuth();
+  const { quizData, quizzesLoading, removeQuiz, user, logout, updateQuiz } =
+    useAuth();
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
@@ -51,6 +52,12 @@ export default function HomePage() {
     navigator.clipboard.writeText(link);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000); // reset after 2 seconds
+  };
+
+  const handleClose = async (quiz: Quiz) => {
+    const response = await QuizService.update(quiz.id, { status: "closed" });
+    if (!response.success) return;
+    updateQuiz({ ...quiz, status: "closed" });
   };
 
   const stats = {
@@ -218,7 +225,9 @@ export default function HomePage() {
                         className={`px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-xs font-medium capitalize ${
                           quiz.status === "published"
                             ? "bg-green-400/10 text-green-400"
-                            : "bg-white/10 text-white/40"
+                            : quiz.status === "closed"
+                              ? "bg-orange-400/10 text-orange-400"
+                              : "bg-white/10 text-white/40"
                         }`}
                       >
                         {quiz.status}
@@ -297,6 +306,15 @@ export default function HomePage() {
                                   {copiedId === quiz.id
                                     ? "✅ Copied!"
                                     : "📋 Copy link"}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleClose(quiz);
+                                    setOpenMenuId(null);
+                                  }}
+                                  className="w-full text-left px-3 py-2 rounded-lg text-xs text-orange-400/80 hover:bg-orange-500/10 transition-colors bg-transparent border-none cursor-pointer"
+                                >
+                                  🔒 Close quiz
                                 </button>
                               </>
                             )}

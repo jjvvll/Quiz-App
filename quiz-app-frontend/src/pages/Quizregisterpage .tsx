@@ -24,6 +24,13 @@ export default function QuizRegisterPage() {
           setError(response.message);
           return;
         }
+
+        // redirect if quiz is closed
+        if (response.quizData?.status === "closed") {
+          navigate(`/quiz/${token}/closed`, { replace: true });
+          return;
+        }
+
         setQuiz(response.quizData!);
       } catch {
         setError("Quiz not found or no longer available.");

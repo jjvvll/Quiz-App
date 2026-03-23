@@ -1,4 +1,4 @@
-export type QuizStatus = "draft" | "published";
+export type QuizStatus = "draft" | "published" | "closed";
 
 export type QuestionType = "multiple_choice" | "identification" | "essay";
 

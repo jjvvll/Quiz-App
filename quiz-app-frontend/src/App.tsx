@@ -8,6 +8,7 @@ import QuizRegisterPage from "./pages/Quizregisterpage ";
 import TakeQuizPage from "./pages/Takequizpage ";
 import QuizResultPage from "./pages/Quizresultpage";
 import QuizResponsesPage from "./pages/QuizResponsesPage";
+import QuizClosedPage from "./pages/QuizClosedPage";
 
 function App() {
   return (
@@ -37,6 +38,8 @@ function App() {
         <Route path="/quiz/:token/result" element={<QuizResultPage />} />
 
         <Route path="/quiz/:quizId/responses" element={<QuizResponsesPage />} />
+
+        <Route path="/quiz/:token/closed" element={<QuizClosedPage />} />
 
         {/* 404 fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

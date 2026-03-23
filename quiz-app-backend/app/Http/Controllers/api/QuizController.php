@@ -100,7 +100,7 @@ class QuizController extends Controller
             $validated = $request->validate([
                 'title'       => 'sometimes|required|string|max:255',
                 'description' => 'nullable|string',
-                'status'      => 'in:draft,published',
+                'status' => 'sometimes|in:draft,published,closed'
             ]);
 
             $validated['token'] = $quiz->token ?? $this->generateUniqueToken();

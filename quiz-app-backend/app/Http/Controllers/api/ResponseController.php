@@ -76,6 +76,7 @@ class ResponseController extends Controller
                     'id'          => $quiz->id,
                     'title'       => $quiz->title,
                     'description' => $quiz->description,
+                    'status'      => $quiz->status,
                     'items'       => $items,
                 ],
             ], 200);
