@@ -29,12 +29,15 @@ const AuthService = {
     return data;
   },
 
-  async logout(): Promise<void> {
-    await api.post("/api/auth/logout");
+  async logout(): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post("/api/auth/logout");
+    return data;
   },
 
-  async getUser(): Promise<User> {
-    const { data } = await api.get<User>("/api/user");
+  async getUser(): Promise<{ success: boolean; user: User }> {
+    const { data } = await api.get<{ success: boolean; user: User }>(
+      "/api/user",
+    );
     return data;
   },
 };

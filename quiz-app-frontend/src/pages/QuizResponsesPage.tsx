@@ -154,7 +154,7 @@ export default function QuizResponsesPage() {
   // when selectedResponse is set, render the detail view instead of the main page
   if (selectedResponse) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-white font-sans px-4 md:px-8 py-6 max-w-3xl mx-auto">
+      <div className="min-h-screen bg-zinc-950 text-white font-sans px-4 md:px-8 py-6 mx-auto">
         {/* back button clears selectedResponse to return to the list */}
         <button
           onClick={() => setSelectedResponse(null)}
@@ -282,7 +282,7 @@ export default function QuizResponsesPage() {
 
   // --- main responses page ---
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans px-4 md:px-8 py-6 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-zinc-950 text-white font-sans px-4 md:px-8 py-6 mx-auto">
       {/* page header */}
       <div className="flex items-center justify-between mb-8 gap-4">
         <div>

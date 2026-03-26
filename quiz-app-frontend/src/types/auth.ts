@@ -7,9 +7,10 @@ export interface User {
 }
 
 export interface AuthResponse {
+  success: boolean;
+  message: string;
   user: User;
-  access_token: string;
-  token_type: string;
+  errors?: Record<string, string[]>;
 }
 
 export interface LoginCredentials {
