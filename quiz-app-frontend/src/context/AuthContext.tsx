@@ -34,20 +34,6 @@ export const AuthProvider = ({ children }: Props) => {
 
   const [quizData, setQuizzes] = useState<Quiz[]>([]);
 
-  // const checkAuth = async () => {
-  //   setQuizzesLoading(true);
-  //   try {
-  //     const userData = await AuthService.getUser();
-  //     setUser(userData);
-  //     return true;
-  //   } catch (error) {
-  //     setUser(null);
-  //     return false;
-  //   } finally {
-  //     setQuizzesLoading(false);
-  //   }
-  // };
-
   const checkAuth = async () => {
     try {
       const data = await AuthService.getUser();
@@ -94,17 +80,6 @@ export const AuthProvider = ({ children }: Props) => {
   const removeQuiz = (id: number) => {
     setQuizzes((prev) => prev.filter((q) => q.id !== id));
   };
-
-  // const login = async (credentials: LoginCredentials): Promise<void> => {
-  //   const { user } = await AuthService.login(credentials);
-  //   setUser(user);
-  //   await getQuizzes(); //get quizzes right after login
-  // };
-
-  // const register = async (credentials: RegisterCredentials): Promise<void> => {
-  //   const { user } = await AuthService.register(credentials);
-  //   setUser(user);
-  // };
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     const data = await AuthService.login(credentials);
