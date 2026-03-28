@@ -9,6 +9,7 @@ import TakeQuizPage from "./pages/Takequizpage ";
 import QuizResultPage from "./pages/Quizresultpage";
 import QuizResponsesPage from "./pages/QuizResponsesPage";
 import QuizClosedPage from "./pages/QuizClosedPage";
+import RegisterPage from "./pages/Registerpage ";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         {/* Guest-only routes (redirect to /home if already logged in) */}
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<LoginPage />} />
-          {/* <Route path="/register" element={<RegisterPage />} /> */}
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
 
         {/* Protected routes (redirect to /login if not authenticated) */}
