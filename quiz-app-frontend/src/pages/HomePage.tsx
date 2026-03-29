@@ -66,6 +66,14 @@ export default function HomePage() {
     drafts: quizzes.filter((q) => q.status === "draft").length,
   };
 
+  const handleToggleStatus = async (quiz: Quiz) => {
+    if ((quiz.quiz_items_count ?? 0) === 0) return; // no items, do nothing
+    const newStatus = quiz.status === "draft" ? "published" : "draft";
+    const response = await QuizService.update(quiz.id, { status: newStatus });
+    if (!response.success) return;
+    updateQuiz({ ...quiz, status: newStatus });
+  };
+
   return (
     <>
       <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans">
@@ -221,17 +229,52 @@ export default function HomePage() {
 
                     {/* Right */}
                     <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                      <span
-                        className={`px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-xs font-medium capitalize ${
-                          quiz.status === "published"
-                            ? "bg-green-400/10 text-green-400"
-                            : quiz.status === "closed"
-                              ? "bg-orange-400/10 text-orange-400"
-                              : "bg-white/10 text-white/40"
-                        }`}
-                      >
-                        {quiz.status}
-                      </span>
+                      {/* Status badge + toggle */}
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-xs font-medium capitalize ${
+                            quiz.status === "published"
+                              ? "bg-green-400/10 text-green-400"
+                              : quiz.status === "closed"
+                                ? "bg-orange-400/10 text-orange-400"
+                                : "bg-white/10 text-white/40"
+                          }`}
+                        >
+                          {quiz.status}
+                        </span>
+
+                        {/* Toggle only shows if quiz has items and is not closed */}
+                        {(quiz.quiz_items_count ?? 0) > 0 &&
+                          quiz.status !== "closed" && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleStatus(quiz);
+                              }}
+                              className={`relative w-8 h-4 rounded-full transition-colors flex-shrink-0 border-none cursor-pointer ${
+                                quiz.status === "published"
+                                  ? "bg-green-400/30"
+                                  : "bg-white/10"
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${
+                                  quiz.status === "published"
+                                    ? "left-4 bg-green-400"
+                                    : "left-0.5 bg-white/30"
+                                }`}
+                              />
+                            </button>
+                          )}
+
+                        {/* No items warning */}
+                        {(quiz.quiz_items_count ?? 0) === 0 && (
+                          <span className="text-white/20 text-xs hidden sm:block">
+                            no questions
+                          </span>
+                        )}
+                      </div>
+
                       <span className="text-white/20 text-xs hidden sm:block">
                         {new Date(quiz.created_at).toLocaleDateString()}
                       </span>

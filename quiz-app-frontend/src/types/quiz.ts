@@ -9,6 +9,7 @@ export interface Quiz {
   description: string | null;
   status: QuizStatus;
   token: string;
+  quiz_items_count?: number;
   created_at: string;
   updated_at: string;
 }

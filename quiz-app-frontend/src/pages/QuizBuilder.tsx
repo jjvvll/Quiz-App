@@ -4,6 +4,7 @@ import QuizItemService from "../services/QuizItemService";
 import { useNavigate } from "react-router-dom";
 import type { QuestionItem } from "../types/quizItem";
 import type { QuestionType } from "../types/quiz";
+import { useAuth } from "../context/AuthContext";
 
 // export interface QuestionPayload {
 //   quiz_id: number;
@@ -51,6 +52,8 @@ export default function QuestionBuilder() {
   const { quizId } = useParams();
   const parsedQuizId = parseInt(quizId ?? "0");
   const navigate = useNavigate();
+
+  const { refreshQuizzes } = useAuth();
 
   const [questions, setQuestions] = useState<QuestionDraft[]>([]);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
@@ -186,12 +189,13 @@ export default function QuestionBuilder() {
         time_limit: q.time_limit,
       }));
 
-      console.log(parsedQuizId, payload);
+      // in handleSave after successful store
       const response = await QuizItemService.store(parsedQuizId, payload);
       if (!response.success) {
         setError(response.message);
         return;
       }
+      await refreshQuizzes(); // 👈 refetch so quiz_items_count is updated
       navigate("/home");
     } finally {
       setSaving(false);

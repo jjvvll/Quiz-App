@@ -17,6 +17,7 @@ class QuizController extends Controller
             $this->authorize('viewAny', Quiz::class); //
             $quizzes = $request->user()
                 ->quizzes()
+                ->withCount('quizItems')
                 ->latest()
                 ->get();
             return response()->json([
@@ -53,6 +54,7 @@ class QuizController extends Controller
                 'description' => $validated['description'] ?? null,
                 'status'      => $validated['status'] ?? 'draft',
             ]);
+            $quiz->loadCount('quizItems');
             return response()->json([
                 'success'  => true,
                 'message'  => 'Quiz created successfully.',
@@ -75,6 +77,7 @@ class QuizController extends Controller
     {
         try {
             $this->authorize('view', $quiz); // already there
+            $quiz->loadCount('quizItems');
             return response()->json([
                 'success'  => true,
                 'message'  => 'Quiz retrieved successfully.',
@@ -97,6 +100,7 @@ class QuizController extends Controller
     {
         try {
             $this->authorize('update', $quiz);
+            $quiz->loadCount('quizItems');
             $validated = $request->validate([
                 'title'       => 'sometimes|required|string|max:255',
                 'description' => 'nullable|string',

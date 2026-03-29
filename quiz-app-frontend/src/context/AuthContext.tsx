@@ -13,6 +13,7 @@ interface AuthContextValue {
   user: User | null;
   quizData: Quiz[];
   quizzesLoading: boolean;
+  refreshQuizzes: () => void;
   appendQuiz: (newQuizz: Quiz[]) => void;
   updateQuiz: (newQuizz: Quiz) => void;
   removeQuiz: (id: number) => void;
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }: Props) => {
     setQuizzesLoading(true);
     try {
       const response = await QuizService.getAll();
+      console.log("hi");
       setQuizzes((response.quizData ?? []).filter(Boolean)); //ensures no undefined elements sneak into your array. Useful if backend could send null items accidentally.
     } catch (error) {
       console.error(error);
@@ -103,6 +105,7 @@ export const AuthProvider = ({ children }: Props) => {
         user,
         quizData,
         quizzesLoading,
+        refreshQuizzes: getQuizzes,
         appendQuiz,
         updateQuiz,
         removeQuiz,
