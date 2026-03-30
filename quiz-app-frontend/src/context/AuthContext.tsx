@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: Props) => {
   const checkAuth = async () => {
     try {
       const data = await AuthService.getUser();
-      setUser(data.user); // 👈 was just data before
+      setUser(data.user); // was just data before
       return true;
     } catch (error) {
       setUser(null);
@@ -52,7 +52,6 @@ export const AuthProvider = ({ children }: Props) => {
     setQuizzesLoading(true);
     try {
       const response = await QuizService.getAll();
-      console.log("hi");
       setQuizzes((response.quizData ?? []).filter(Boolean)); //ensures no undefined elements sneak into your array. Useful if backend could send null items accidentally.
     } catch (error) {
       console.error(error);

@@ -15,7 +15,7 @@ interface FormErrors {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -110,6 +110,12 @@ export default function LoginPage() {
             <p className="text-white/40 text-sm font-light">
               Sign in to continue your journey
             </p>
+            {/* Debug — remove after testing */}
+            {user && (
+              <p className="mt-2 text-xs text-amber-400/60">
+                Already logged in as: {user.name}
+              </p>
+            )}
           </div>
 
           {/* General error */}

@@ -106,13 +106,38 @@ class AuthController extends Controller
         }
     }
 
+    // public function user(Request $request): JsonResponse
+    // {
+    //     try {
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'User retrieved successfully.',
+    //             'user'    => $request->user(),
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to retrieve user.',
+    //         ], 500);
+    //     }
+    // }
+
     public function user(Request $request): JsonResponse
     {
         try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'User retrieved successfully.',
-                'user'    => $request->user(),
+                'user'    => $user,
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -27,18 +27,19 @@ function App() {
         {/* Protected routes (redirect to /login if not authenticated) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomePage />} />
+          <Route
+            path="/quiz/:quizId/responses"
+            element={<QuizResponsesPage />}
+          />
+          <Route path="/quiz/:quizId/questions" element={<QuestionBuilder />} />
           {/* Future routes: */}
           {/* <Route path="/quiz/:id" element={<QuizPage />} /> */}
           {/* <Route path="/results" element={<ResultsPage />} /> */}
         </Route>
 
-        <Route path="/quiz/:quizId/questions" element={<QuestionBuilder />} />
-
         <Route path="/quiz/:token" element={<QuizRegisterPage />} />
         <Route path="/quiz/:token/take" element={<TakeQuizPage />} />
         <Route path="/quiz/:token/result" element={<QuizResultPage />} />
-
-        <Route path="/quiz/:quizId/responses" element={<QuizResponsesPage />} />
 
         <Route path="/quiz/:token/closed" element={<QuizClosedPage />} />
 
