@@ -73,7 +73,7 @@ export default function HomePage() {
     if (!response.success) return;
     updateQuiz({ ...quiz, status: newStatus });
   };
-
+  console.log(user);
   return (
     <>
       <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans">
